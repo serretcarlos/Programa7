@@ -12,20 +12,44 @@ namespace Programa7
     class Controlador
     {
         private Archivo archivo;
-        private double sumXiYi;
+        static double EPS = 0.0000000001;
+
+        private double sumWi;
+        private double sumWiXi;
+        private double sumWiYi;
+        private double sumWiZi;
+        private double sumWi2;
+
         private double sumXi;
-        private double sumYi;
+        private double sumXiYi;
+        private double sumXiZi;
         private double sumXi2;
+
+        private double sumYi;
+        private double sumYiZi;
         private double sumYi2;
 
+        private double sumZi;
+        
         //&i
         public Controlador()
         {
-            sumXiYi = 0;
+            sumWi = 0;
+            sumWiXi = 0;
+            sumWiYi = 0;
+            sumWiZi = 0;
+            sumWi2 = 0;
+
             sumXi = 0;
-            sumYi = 0;
+            sumXiYi = 0;
+            sumXiZi = 0;
             sumXi2 = 0;
+
+            sumYi = 0;
+            sumYiZi = 0;
             sumYi2 = 0;
+
+            sumZi = 0;
         }
 
 
@@ -54,25 +78,49 @@ namespace Programa7
                 try
                 {
                     string sLinea = entrada.ReadLine();
-                    archivo.Xk = double.Parse(sLinea);
+                    string[] arrNums = sLinea.Split(',');
+                    archivo.Wk = double.Parse(arrNums[0]);
+                    archivo.Xk = double.Parse(arrNums[1]);  //&m
+                    archivo.Yk = double.Parse(arrNums[2]);
                     sLinea = entrada.ReadLine();
+                    double wi = 0, xi = 0, yi = 0, zi = 0;
                     while (sLinea != null)
                     {
-                        string[] arrPareja = sLinea.Split(',');
-                        sumXi += double.Parse(arrPareja[0]);
-                        sumYi += double.Parse(arrPareja[1]);
-                        sumXiYi += (double.Parse(arrPareja[0]) * double.Parse(arrPareja[1]));
-                        sumXi2 += (double)Math.Pow(double.Parse(arrPareja[0]), 2);
-                        sumYi2 += (double)Math.Pow(double.Parse(arrPareja[1]), 2);
-                        archivo.Parejas++;
+                        string[] arrCuadruplos = sLinea.Split(','); //&m
+                        wi = double.Parse(arrCuadruplos[0]);
+                        xi = double.Parse(arrCuadruplos[1]);
+                        yi = double.Parse(arrCuadruplos[2]);
+                        zi = double.Parse(arrCuadruplos[3]);
+
+                        sumWi += wi;
+                        sumWiXi += (wi * xi);
+                        sumWiYi += (wi * yi);
+                        sumWiZi += (wi + zi);
+                        sumWi2 += (wi * wi);
+
+                        sumXi += xi;    //&m
+                        sumXiYi += (xi * yi);   //&m
+                        sumXiZi += (xi * zi);
+                        sumXi2 += (xi * xi);  //&m
+
+                        sumYi += yi;    //&m
+                        sumYiZi += (yi * zi);
+                        sumYi2 += (yi * yi);  //&m
+
+                        sumZi += zi;
+                        archivo.Cuadruplos++;   //&m
                         sLinea = entrada.ReadLine();
                     }
-                    archivo.Rxy = CalcularRxy();
-                    archivo.R2 = CalcularR2();
-                    archivo.B1 = CalcularB1();
-                    archivo.B0 = CalcularB0();
-                    archivo.Yk = CalcularYk();
-                    archivo.toString();
+                    //&d=5
+
+
+                    //archivo.toString();
+                    double[,] temp = new double[,] { { archivo.Cuadruplos, sumWi, sumXi, sumYi, sumZi },
+                                                       { sumWi, sumWi2, sumWiXi, sumWiYi, sumWiZi},
+                                                        { sumXi, sumWiXi, sumXi2, sumXiYi, sumXiZi}, 
+                                                        { sumYi, sumWiYi, sumXiYi, sumYi2, sumYiZi} };
+                    double[] x = Gauss(temp);
+
                 }
                 catch (Exception e)
                 {
@@ -82,32 +130,49 @@ namespace Programa7
         }
 
 
-        /// <summary>
-        /// Se calcula el valor de r2
-        /// </summary>
-        /// <returns>valor tipo doble r2</returns>
-        //&i
-        private double CalcularR2()
+        public double[] Gauss(double [,] A)
         {
-            double r2 = archivo.Rxy * archivo.Rxy;
-            return r2;
+            int i, j, k, n = 4;
+            /*for (i = 0; i < n; i++)                    //Pivotisation
+                for (k = i + 1; k < n; k++)
+                    if (A[i,i] < A[k,i])
+                        for (j = 0; j <= n; j++)
+                        {
+                            double temp = A[i,j];
+                            A[i,j] = A[k,j];
+                            A[k,j] = temp;
+                        }
+            */
+
+            for (i = 0; i < n - 1; i++)            //loop to perform the gauss elimination
+                for (k = i + 1; k < n; k++)
+                {
+                    double t = A[k,i] / A[i,i];
+                    for (j = 0; j <= n; j++)
+                        A[k,j] = A[k,j] - t * A[i,j];    //make the elements below the pivot elements equal to zero or elimnate the variables
+                }
+
+            double[] x = new double[n];
+            for (i = n - 1; i >= 0; i--)                //back-substitution
+            {                        //x is an array whose values correspond to the values of x,y,z..
+                x[i] = A[i,n];                //make the variable to be calculated equal to the rhs of the last equation
+                for (j = i + 1; j < n; j++)
+                {
+                    if (j != i)            //then subtract all the lhs values except the coefficient of the variable whose value                                   is being calculated
+                        x[i] = x[i] - A[i, j] * x[j];
+                }
+                x[i] = x[i] / A[i,i];            //now finally divide the rhs by the coefficient of the variable to be calculated
+            }
+            Console.WriteLine("\nThe values of the variables are as follows:\n");
+            for (i = 0; i < n; i++)
+                Console.WriteLine(x[i] + "  ");           // Print the values of x, y,z,....    
+            return x;
         }
 
-        /// <summary>
-        /// Se calcula el valor de rxy
-        /// </summary>
-        /// <returns>valor tipo doble rxy</returns>
-        //&i
-        private double CalcularRxy()
-        {
-            double mediaXi = sumXi / archivo.Parejas;
-            double mediaYi = sumYi / archivo.Parejas;
-            double covarianza = sumXiYi / archivo.Parejas - mediaXi * mediaYi;
-            double desviacion1 = Math.Sqrt(sumXi2 / archivo.Parejas - (mediaXi * mediaXi));
-            double desviacion2 = Math.Sqrt(sumYi2 / archivo.Parejas - (mediaYi * mediaYi));
-            double rxy = covarianza / (desviacion1 * desviacion2);
-            return rxy;
-        }
+
+        //&d=3
+
+        //&d=8
 
         /// <summary>
         /// Se calcula el valor de b0
@@ -116,7 +181,7 @@ namespace Programa7
         //&i
         private double CalcularB0()
         {
-            return sumYi / archivo.Parejas - archivo.B1 * (sumXi / archivo.Parejas);
+            return sumYi / archivo.Cuadruplos - archivo.B1 * (sumXi / archivo.Cuadruplos);  //&m
         }
 
         /// <summary>
@@ -126,19 +191,10 @@ namespace Programa7
         //&i
         private double CalcularB1()
         {
-            return (sumXiYi - (archivo.Parejas * (sumXi / archivo.Parejas) * (sumYi / archivo.Parejas))) /
-                (sumXi2 - (archivo.Parejas * ((sumXi / archivo.Parejas) * (sumXi / archivo.Parejas))));
+            return (sumXiYi - (archivo.Cuadruplos * (sumXi / archivo.Cuadruplos) * (sumYi / archivo.Cuadruplos))) /   //&m
+                (sumXi2 - (archivo.Cuadruplos * ((sumXi / archivo.Cuadruplos) * (sumXi / archivo.Cuadruplos))));    //&m
         }
 
-        /// <summary>
-        /// Se calcula el valor de yk
-        /// </summary>
-        /// <returns>valor tipo doble yk</returns>
-        //&i
-        private double CalcularYk()
-        {
-            double yk = archivo.B0 + archivo.B1 * archivo.Xk;
-            return yk;
-        }
+        //&d=3
     }
 }
