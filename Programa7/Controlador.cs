@@ -12,8 +12,6 @@ namespace Programa7
     class Controlador
     {
         private Archivo archivo;
-        static double EPS = 0.0000000001;
-
         private double sumWi;
         private double sumWiXi;
         private double sumWiYi;
@@ -81,7 +79,7 @@ namespace Programa7
                     string[] arrNums = sLinea.Split(',');
                     archivo.Wk = double.Parse(arrNums[0]);
                     archivo.Xk = double.Parse(arrNums[1]);  //&m
-                    archivo.Yk = double.Parse(arrNums[2]);
+                    archivo.Yk = double.Parse(arrNums[2]);  //&m
                     sLinea = entrada.ReadLine();
                     double wi = 0, xi = 0, yi = 0, zi = 0;
                     while (sLinea != null)
@@ -112,13 +110,13 @@ namespace Programa7
                         sLinea = entrada.ReadLine();
                     }
                     //&d=5
-                    double[,] temp = new double[,] { { archivo.Cuadruplos, sumWi, sumXi, sumYi, sumZi },
-                                                       { sumWi, sumWi2, sumWiXi, sumWiYi, sumWiZi},
+                    double[,] temp = new double[,] {    { archivo.Cuadruplos, sumWi, sumXi, sumYi, sumZi },
+                                                        { sumWi, sumWi2, sumWiXi, sumWiYi, sumWiZi},
                                                         { sumXi, sumWiXi, sumXi2, sumXiYi, sumXiZi},
-                                                        { sumYi, sumWiYi, sumXiYi, sumYi2, sumYiZi} };
+                                                        { sumYi, sumWiYi, sumXiYi, sumYi2, sumYiZi}     };
                     double[] x = Gauss(temp);
-                    archivo.B0 = x[0];
-                    archivo.B1 = x[1];
+                    archivo.B0 = x[0];  //&m
+                    archivo.B1 = x[1];  //&m
                     archivo.B2 = x[2];
                     archivo.B3 = x[3];
                     archivo.ZK = archivo.B0 + (archivo.B1 * archivo.Wk) + (archivo.B2 * archivo.Xk) + (archivo.B3 * archivo.Yk);
@@ -132,28 +130,33 @@ namespace Programa7
             }
         }
 
+        /// <summary>
+        /// Calcula los parametros de regresión multiple
+        /// </summary>
+        /// <param name="A">arrego de valores tipo doble</param>
+        /// <returns>arreglo de valores tipo doble</returns>
         //&i
         public double[] Gauss(double[,] A)
         {
-            int i, j, k, n = A.GetLength(0);
+            int n = A.GetLength(0);
             double c;
             double[] x = new double[n];
 
-            for (j = 0; j < n; j++)
+            for (int j = 0; j < n; j++)
             {
-                for (i = 0; i < n; i++)
+                for (int i = 0; i < n; i++)
                 {
                     if (i != j)
                     {
                         c = A[i,j] / A[j,j];
-                        for (k = 0; k < n + 1; k++)
+                        for (int k = 0; k < n + 1; k++)
                         {
                             A[i,k] = A[i,k] - c * A[j,k];
                         }
                     }
                 }
             }
-            for (i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
                 x[i] = A[i,n] / A[i,i];
                 /*if ((A[i,i] != A[i,i]) || (A[i,i] == 0))
@@ -163,15 +166,6 @@ namespace Programa7
         }
 
 
-        //&d=3
-
-        //&d=8
-
-        
-        //&d=2
-
-        //&d=3
-
-        //&d=3
+        //&d=19
     }
 }
