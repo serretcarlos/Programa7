@@ -30,7 +30,7 @@ namespace Programa7
         private double sumYi2;
 
         private double sumZi;
-        
+
         //&i
         public Controlador()
         {
@@ -95,7 +95,7 @@ namespace Programa7
                         sumWi += wi;
                         sumWiXi += (wi * xi);
                         sumWiYi += (wi * yi);
-                        sumWiZi += (wi + zi);
+                        sumWiZi += (wi * zi);
                         sumWi2 += (wi * wi);
 
                         sumXi += xi;    //&m
@@ -112,15 +112,18 @@ namespace Programa7
                         sLinea = entrada.ReadLine();
                     }
                     //&d=5
-
-
-                    //archivo.toString();
                     double[,] temp = new double[,] { { archivo.Cuadruplos, sumWi, sumXi, sumYi, sumZi },
                                                        { sumWi, sumWi2, sumWiXi, sumWiYi, sumWiZi},
-                                                        { sumXi, sumWiXi, sumXi2, sumXiYi, sumXiZi}, 
+                                                        { sumXi, sumWiXi, sumXi2, sumXiYi, sumXiZi},
                                                         { sumYi, sumWiYi, sumXiYi, sumYi2, sumYiZi} };
                     double[] x = Gauss(temp);
-
+                    archivo.B0 = x[0];
+                    archivo.B1 = x[1];
+                    archivo.B2 = x[2];
+                    archivo.B3 = x[3];
+                    archivo.ZK = archivo.B0 + (archivo.B1 * archivo.Wk) + (archivo.B2 * archivo.Xk) + (archivo.B3 * archivo.Yk);
+                    archivo.toString();
+                    
                 }
                 catch (Exception e)
                 {
@@ -129,43 +132,33 @@ namespace Programa7
             }
         }
 
-
-        public double[] Gauss(double [,] A)
+        //&i
+        public double[] Gauss(double[,] A)
         {
-            int i, j, k, n = 4;
-            /*for (i = 0; i < n; i++)                    //Pivotisation
-                for (k = i + 1; k < n; k++)
-                    if (A[i,i] < A[k,i])
-                        for (j = 0; j <= n; j++)
-                        {
-                            double temp = A[i,j];
-                            A[i,j] = A[k,j];
-                            A[k,j] = temp;
-                        }
-            */
-
-            for (i = 0; i < n - 1; i++)            //loop to perform the gauss elimination
-                for (k = i + 1; k < n; k++)
-                {
-                    double t = A[k,i] / A[i,i];
-                    for (j = 0; j <= n; j++)
-                        A[k,j] = A[k,j] - t * A[i,j];    //make the elements below the pivot elements equal to zero or elimnate the variables
-                }
-
+            int i, j, k, n = A.GetLength(0);
+            double c;
             double[] x = new double[n];
-            for (i = n - 1; i >= 0; i--)                //back-substitution
-            {                        //x is an array whose values correspond to the values of x,y,z..
-                x[i] = A[i,n];                //make the variable to be calculated equal to the rhs of the last equation
-                for (j = i + 1; j < n; j++)
+
+            for (j = 0; j < n; j++)
+            {
+                for (i = 0; i < n; i++)
                 {
-                    if (j != i)            //then subtract all the lhs values except the coefficient of the variable whose value                                   is being calculated
-                        x[i] = x[i] - A[i, j] * x[j];
+                    if (i != j)
+                    {
+                        c = A[i,j] / A[j,j];
+                        for (k = 0; k < n + 1; k++)
+                        {
+                            A[i,k] = A[i,k] - c * A[j,k];
+                        }
+                    }
                 }
-                x[i] = x[i] / A[i,i];            //now finally divide the rhs by the coefficient of the variable to be calculated
             }
-            Console.WriteLine("\nThe values of the variables are as follows:\n");
             for (i = 0; i < n; i++)
-                Console.WriteLine(x[i] + "  ");           // Print the values of x, y,z,....    
+            {
+                x[i] = A[i,n] / A[i,i];
+                /*if ((A[i,i] != A[i,i]) || (A[i,i] == 0))
+                    break;*/
+            }
             return x;
         }
 
@@ -174,26 +167,10 @@ namespace Programa7
 
         //&d=8
 
-        /// <summary>
-        /// Se calcula el valor de b0
-        /// </summary>
-        /// <returns>valor tipo doble b0</returns>
-        //&i
-        private double CalcularB0()
-        {
-            return sumYi / archivo.Cuadruplos - archivo.B1 * (sumXi / archivo.Cuadruplos);  //&m
-        }
+        
+        //&d=2
 
-        /// <summary>
-        /// Se calcula el valor de b1
-        /// </summary>
-        /// <returns>valor tipo doble b1</returns>
-        //&i
-        private double CalcularB1()
-        {
-            return (sumXiYi - (archivo.Cuadruplos * (sumXi / archivo.Cuadruplos) * (sumYi / archivo.Cuadruplos))) /   //&m
-                (sumXi2 - (archivo.Cuadruplos * ((sumXi / archivo.Cuadruplos) * (sumXi / archivo.Cuadruplos))));    //&m
-        }
+        //&d=3
 
         //&d=3
     }

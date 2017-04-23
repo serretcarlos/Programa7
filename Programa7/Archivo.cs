@@ -107,11 +107,17 @@ namespace Programa7
             set { b3 = value; }
             get { return b3; }
         }
+
+        public double ZK
+        {
+            set { zk = value; }
+            get { return zk; }
+        }
         
         //&i
         public void toString()
         {
-            Console.WriteLine("N = " + cuadruplos + "\nwk = " + wk + "\nxk = " + xk + "\nyk = " + yk + "\n------------\nb0 = " + b0.ToString("N5") + //&m
+            Console.WriteLine("N = " + cuadruplos + "\nwk = " + wk.ToString("N5") + "\nxk = " + xk.ToString("N5") + "\nyk = " + yk.ToString("N5") + "\n------------\nb0 = " + b0.ToString("N5") + //&m
                 "\nb1 = " + b1.ToString("N5") + "\nb2 = " + b2.ToString("N5") + "\nb3 = " + b3.ToString("N5") + "\n------------\nzk = " + zk.ToString("N5")); //&m
         }
     }
