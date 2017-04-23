@@ -13,9 +13,8 @@ namespace Programa7
         private double cuadruplos = 0;//&m
         private double wk;
         private double xk;
-        private double yk;
-        /*private double rxy;
-        private double r2;*/ //&d=2
+        private double yk; 
+        //&d=2
         private double b0;
         private double b1;
         private double b2;
@@ -29,8 +28,7 @@ namespace Programa7
             wk = 0;
             xk = 0;
             yk = 0;
-            /*rxy = 0;
-            r2 = 0;*/ //&d=2
+            //&d=2
             b0 = 0;
             b1 = 0;
             b2 = 0;
@@ -66,19 +64,7 @@ namespace Programa7
             get { return yk; }
         }
 
-        /*public double Rxy
-        {
-            set { rxy = value; }
-            get { return rxy; }
-        }*/ //&d=3
-
-
-
-        /*public double R2
-        {
-            set { r2 = value; }
-            get { return r2; }
-        }*/  //&d=3
+        //&d=6
 
         //&i
         public double B0
